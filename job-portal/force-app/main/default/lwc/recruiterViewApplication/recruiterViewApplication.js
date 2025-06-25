@@ -3,6 +3,10 @@ import getRecruiterJobs from '@salesforce/apex/ApplicationController.getRecruite
 import getApplicationsForJob from '@salesforce/apex/ApplicationController.getApplicationsForJob';
 import updateApplicationStatus from '@salesforce/apex/ApplicationController.updateApplicationStatus';
 import sendEmailToCandidate from '@salesforce/apex/ApplicationController.sendEmailToCandidate';
+
+import scheduleInterview from '@salesforce/apex/ApplicationController.scheduleInterview';
+import sendInterviewGoogleCalendarLinkEmail from '@salesforce/apex/ApplicationController.sendInterviewGoogleCalendarLinkEmail';
+
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class RecruiterViewApplication extends LightningElement {
@@ -16,7 +20,8 @@ export default class RecruiterViewApplication extends LightningElement {
     @track emailSubject = '';
     @track emailBody = '';
 
-    // Load recruiter's jobs on component wire
+    @track interviewDateTime = '';
+
     @wire(getRecruiterJobs)
     wiredJobs({ data, error }) {
         if (data) {
@@ -30,13 +35,6 @@ export default class RecruiterViewApplication extends LightningElement {
         }
     }
 
-    get jobsOptions() {
-        return this.jobs.map(job => ({
-            label: job.Title__c,
-            value: job.Id
-        }));
-    }
-
     get statusOptions() {
         return [
             { label: 'All', value: '' },
@@ -46,17 +44,10 @@ export default class RecruiterViewApplication extends LightningElement {
             { label: 'Rejected', value: 'Rejected' }
         ];
     }
-    
 
     handleJobSelect(event) {
         const jobId = event.currentTarget.dataset.id;
         this.selectedJobId = jobId;
-        this.selectedApplication = null;
-        this.loadApplications();
-    }
-
-    handleJobChange(event) {
-        this.selectedJobId = event.target.value;
         this.selectedApplication = null;
         this.loadApplications();
     }
@@ -85,6 +76,7 @@ export default class RecruiterViewApplication extends LightningElement {
         this.selectedApplication = this.applications.find(app => String(app.applicationId) === applicationId);
         this.emailSubject = '';
         this.emailBody = '';
+        this.interviewDateTime = this.selectedApplication?.interviewDate ? this.selectedApplication.interviewDate : '';
     }
 
     handleStatusUpdate(newStatus) {
@@ -141,5 +133,38 @@ export default class RecruiterViewApplication extends LightningElement {
 
     showToast(title, message, variant) {
         this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
+    }
+
+    handleInputChange(event) {
+        const { name, value } = event.target;
+        this[name] = value;
+    }
+    
+    handleScheduleInterview() {
+        if (!this.selectedApplication || !this.interviewDateTime) {
+            this.showToast('Error', 'Please select a candidate and set interview date/time.', 'error');
+            return;
+        }
+
+        scheduleInterview({
+            applicationId: this.selectedApplication.applicationId,
+            interviewDateTime: this.interviewDateTime
+        })
+        .then(() => {
+            return sendInterviewGoogleCalendarLinkEmail({
+                applicationId: this.selectedApplication.applicationId,
+                interviewDateTime: this.interviewDateTime
+            });
+        })
+        .then(() => {
+            this.showToast('Success', 'Interview scheduled and Google Calendar invite sent.', 'success');
+            this.interviewDateTime = '';
+            this.loadApplications();
+            this.selectedApplication = null;
+        })
+        .catch(error => {
+            this.showToast('Error', error?.body?.message || error.message, 'error');
+            console.error(error);
+        });
     }
 }

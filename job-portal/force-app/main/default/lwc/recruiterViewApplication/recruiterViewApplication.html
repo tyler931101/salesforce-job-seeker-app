@@ -6,7 +6,7 @@
             <template if:true={jobs}>
                 <ul style="list-style: none; padding: 0; margin: 0;">
                     <template for:each={jobs} for:item="job">
-                        <li style="padding: 0.75rem, 1rem; border-bottom: 1px solid #e9ecef; cursor: pointer; transition: background-color 0.2s; font-size: 1.25rem;"
+                        <li style="padding: 0.75rem 1rem; border-bottom: 1px solid #e9ecef; cursor: pointer; transition: background-color 0.2s; font-size: 1.25rem;"
                             key={job.Id}
                             data-id={job.Id}
                             onclick={handleJobSelect}
@@ -44,6 +44,19 @@
                 <p style="margin: 0.25rem 0;"><strong>Email:</strong> {selectedApplication.candidateEmail}</p>
                 <p style="margin: 0.25rem 0;"><strong>Status:</strong> {selectedApplication.status}</p>
 
+                <h3 style="margin-top: 1.5rem;">Schedule Interview</h3>
+                <lightning-input type="datetime" 
+                                label="Interview Date & Time"
+                                name="interviewDateTime"
+                                value={interviewDateTime}
+                                onchange={handleInputChange}>
+                </lightning-input>
+                <lightning-button style="margin-top: 0.5rem;" 
+                                label="Schedule Interview & Send Google Calendar Invite"
+                                variant="brand"
+                                onclick={handleScheduleInterview}>
+                </lightning-button>
+
                 <template if:true={selectedApplication.resumeUrl}>
                     <p><a href={selectedApplication.resumeUrl} target="_blank" download>Download Resume</a></p>
                 </template>
@@ -52,7 +65,7 @@
                 <lightning-button style="margin: 0.5rem 0.5rem 0.5rem 0;" label="Hired" onclick={handleMarkHired}></lightning-button>
                 <lightning-button style="margin: 0.5rem 0.5rem 0.5rem 0;" label="Rejected" onclick={handleMarkRejected}></lightning-button>
 
-                <h3 style="margin: 1rem, 0.5rem">Send Email</h3>
+                <h3 style="margin: 1rem 0.5rem">Send Email</h3>
                 <lightning-input name="emailSubject" label="Subject" value={emailSubject} onchange={handleEmailInputChange}></lightning-input>
                 <lightning-textarea name="emailBody" label="Body" value={emailBody} onchange={handleEmailInputChange}></lightning-textarea>
                 <lightning-button style="margin: 0.5rem 0.5rem 0.5rem 0;" label="Send Email" onclick={handleSendEmail}></lightning-button>

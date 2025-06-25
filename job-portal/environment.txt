@@ -34,7 +34,7 @@ sf deploy metadata --source-dir force-app/main/default/classes --target-org JobS
 //Redeploy your LWC source
 sf deploy metadata --source-dir force-app/main/default/lwc/candidateRegistration --target-org JobSeekerDevOrg
 
-
+sf force:org:open -u JobSeekerDevOrg
 
 Add input validation (e.g. strong password rules),
 
