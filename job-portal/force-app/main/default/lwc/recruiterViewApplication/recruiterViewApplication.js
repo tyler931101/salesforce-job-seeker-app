@@ -146,11 +146,13 @@ export default class RecruiterViewApplication extends LightningElement {
             return;
         }
 
+        // Step 1: update Application interview date
         scheduleInterview({
             applicationId: this.selectedApplication.applicationId,
             interviewDateTime: this.interviewDateTime
         })
         .then(() => {
+            // Step 2: send Google Calendar invite email
             return sendInterviewGoogleCalendarLinkEmail({
                 applicationId: this.selectedApplication.applicationId,
                 interviewDateTime: this.interviewDateTime

@@ -111,34 +111,48 @@ public with sharing class ApplicationController {
         String candidateEmail = app.Candidate__r.Email__c;
         String candidateName = app.Candidate__r.First_Name__c + ' ' + app.Candidate__r.Last_Name__c;
         String jobTitle = app.Job__r.Title__c;
+        String recruiterEmail = UserInfo.getUserEmail();
 
         Datetime endDateTime = interviewDateTime.addHours(1);
-
         String dtStart = interviewDateTime.formatGMT('yyyyMMdd\'T\'HHmmss\'Z\'');
         String dtEnd = endDateTime.formatGMT('yyyyMMdd\'T\'HHmmss\'Z\'');
 
         String eventTitle = EncodingUtil.urlEncode('Interview for ' + jobTitle, 'UTF-8');
         String eventDetails = EncodingUtil.urlEncode('Interview scheduled with ' + candidateName, 'UTF-8');
         String location = EncodingUtil.urlEncode('Your Company Location', 'UTF-8');
+        String addGuests = EncodingUtil.urlEncode(candidateEmail + ',' + recruiterEmail, 'UTF-8');
 
         String calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
             + '&text=' + eventTitle
             + '&dates=' + dtStart + '/' + dtEnd
             + '&details=' + eventDetails
             + '&location=' + location
-            + '&add=' + EncodingUtil.urlEncode(candidateEmail + ',' + UserInfo.getUserEmail(), 'UTF-8');
+            + '&add=' + addGuests
+            + '&conference=google_meet';
 
-        String emailBody = 'Dear ' + candidateName + ',\n\n' +
+        // Email to candidate
+        String candidateBody = 'Dear ' + candidateName + ',\n\n' +
             'Your interview has been scheduled on ' + interviewDateTime.format('MMMM d, yyyy h:mm a') + '.\n\n' +
             'Please add this interview to your Google Calendar by clicking the link below:\n' +
             calendarUrl + '\n\n' +
             'Best regards,\nRecruitment Team';
 
-        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-        mail.setToAddresses(new String[] { candidateEmail });
-        mail.setSubject('Interview Scheduled for ' + jobTitle);
-        mail.setPlainTextBody(emailBody);
+        Messaging.SingleEmailMessage candidateMail = new Messaging.SingleEmailMessage();
+        candidateMail.setToAddresses(new String[] { candidateEmail });
+        candidateMail.setSubject('Interview Scheduled for ' + jobTitle);
+        candidateMail.setPlainTextBody(candidateBody);
 
-        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        // Email to recruiter
+        String recruiterBody = 'Hello,\n\nYou scheduled an interview with ' + candidateName +
+            ' for the role of "' + jobTitle + '".\n\nClick below to add the interview to your Google Calendar:\n' +
+            calendarUrl + '\n\nBoth you and the candidate are listed as attendees.';
+
+        Messaging.SingleEmailMessage recruiterMail = new Messaging.SingleEmailMessage();
+        recruiterMail.setToAddresses(new String[] { recruiterEmail });
+        recruiterMail.setSubject('Interview Invite Link for ' + candidateName);
+        recruiterMail.setPlainTextBody(recruiterBody);
+
+        // Send both emails
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { candidateMail, recruiterMail });
     }
 }
