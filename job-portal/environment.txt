@@ -1,0 +1,47 @@
+https://www.salesforce.com/form/signup/freetrial-sales/
+
+
+sf force:lightning:component:create --type lwc --componentname candidateRegistration --outputdir force-app/main/default/lwc
+
+
+//Make sure you’re logged in to your Salesforce org
+sf login org
+sf login list
+
+
+//Set your default org
+sf config get target-org
+sf config set default-org <your-org-alias-or-username>
+
+//Debug
+sf project retrieve start --metadata LightningComponentBundle --target-org JobSeekerDevOrg
+
+//Deploy your LWC source
+sf deploy metadata --source-dir force-app --target-org JobSeekerDevOrg
+sf deploy metadata --source-dir force-app/main/default/lwc/candidateRegistration --target-org JobSeekerDevOrg
+
+
+//Open the Deployment Status Page
+https://jobseeker-e79fccb743-dev-ed.develop.my.salesforce.com/lightning/setup/DeployStatus/page?address=%2Fchangemgmt%2FmonitorDeploymentsDetails.apexp%3FasyncId%3D0AfgL000005NmQsSAK%26retURL%3D%252Fchangemgmt%252FmonitorDeployment.apexp
+
+force-app/main/default/classes/CandidateController.cls
+force-app/main/default/classes/CandidateController.cls-meta.xml
+
+//Deploy the Apex Class First
+sf deploy metadata --source-dir force-app/main/default/classes/CandidateController.cls --target-org JobSeekerDevOrg
+sf deploy metadata --source-dir force-app/main/default/classes --target-org JobSeekerDevOrg
+
+//Redeploy your LWC source
+sf deploy metadata --source-dir force-app/main/default/lwc/candidateRegistration --target-org JobSeekerDevOrg
+
+
+
+Add input validation (e.g. strong password rules),
+
+Hook up email confirmation or reCAPTCHA,
+
+Store hashed passwords securely,
+
+Style it with SLDS or add animations,
+
+Or even connect it to Experience Cloud for public signup...

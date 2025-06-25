@@ -1,0 +1,68 @@
+<template>
+    <lightning-card title="Create Job Posting" icon-name="standard:jobs">
+        <div class="slds-p-around_medium">
+            <template if:true={isRecruiter}>
+                <lightning-input label="Job Title" value={title} onchange={handleChange} name="title" required></lightning-input>
+                <lightning-textarea label="Description" value={description} onchange={handleChange} name="description" required></lightning-textarea>
+
+                <lightning-combobox
+                    name="type"
+                    label="Job Type"
+                    value={type}
+                    placeholder="Select Type"
+                    options={typeOptions}
+                    onchange={handleChange}
+                    required>
+                </lightning-combobox>
+
+                <lightning-input
+                    type="number"
+                    label="Salary"
+                    value={salary}
+                    onchange={handleChange}
+                    name="salary"
+                    min="0"
+                    step="0.01"
+                    required>
+                </lightning-input>
+
+                <lightning-combobox
+                    name="status"
+                    label="Status"
+                    value={status}
+                    placeholder="Select Status"
+                    options={statusOptions}
+                    onchange={handleChange}
+                    required>
+                </lightning-combobox>
+
+                <lightning-input label="Location" value={location} onchange={handleChange} name="location" required></lightning-input>
+
+                <lightning-input
+                    type="date"
+                    label="Date Posted"
+                    value={datePosted}
+                    onchange={handleChange}
+                    name="datePosted"
+                    required>
+                </lightning-input>
+
+                <div class="slds-m-top_medium">
+                    <lightning-button label="Create Job" variant="brand" onclick={handleCreateJob}></lightning-button>
+                </div>
+
+                <template if:true={errorMessage}>
+                    <div class="slds-text-color_error slds-m-top_medium">{errorMessage}</div>
+                </template>
+
+                <template if:true={successMessage}>
+                    <div class="slds-text-color_success slds-m-top_medium">{successMessage}</div>
+                </template>
+            </template>
+
+            <template if:false={isRecruiter}>
+                <div>You do not have permission to create jobs.</div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

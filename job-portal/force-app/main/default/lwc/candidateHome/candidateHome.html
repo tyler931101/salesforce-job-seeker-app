@@ -1,0 +1,60 @@
+<template>
+    <!-- Welcome Section -->
+    <lightning-card title="Candidate Home" icon-name="standard:contact">
+        <div class="slds-p-around_medium">
+            <h2>Welcome, {candidateEmail}!</h2>
+            <lightning-button label="Logout" onclick={handleLogout} variant="neutral"></lightning-button>
+        </div>
+    </lightning-card>
+
+    <!-- Job List and Detail View -->
+    <lightning-card title="Available Jobs" icon-name="standard:jobs">
+        <div class="slds-grid slds-wrap">
+            <!-- Left: Job List -->
+            <div class="slds-col slds-size_1-of-3 slds-scrollable_y slds-box" style="max-height: 500px;">
+                <template if:true={jobs}>
+                    <template for:each={jobs} for:item="job">
+                        <div key={job.Id}
+                             class="slds-box slds-m-around_x-small slds-theme_shade"
+                             onclick={handleJobClick}
+                             data-id={job.Id}
+                             style="cursor: pointer;">
+                            <h3 class="slds-text-heading_small">{job.Title__c}</h3>
+                            <p>{job.Type__c} | {job.Location__c} | ${job.Salary__c}</p>
+                        </div>
+                    </template>
+                </template>
+            </div>
+
+            <!-- Right: Job Detail -->
+            <div class="slds-col slds-size_2-of-3 slds-p-around_medium">
+                <template if:true={selectedJob}>
+                    <h2 class="slds-text-heading_medium">{selectedJob.Title__c}</h2>
+                    <p><strong>Location:</strong> {selectedJob.Location__c}</p>
+                    <p><strong>Type:</strong> {selectedJob.Type__c}</p>
+                    <p><strong>Salary:</strong> ${selectedJob.Salary__c}</p>
+                    <p><strong>Posted:</strong> {selectedJob.Date_Posted__c}</p>
+                    <p class="slds-m-top_medium"><strong>Description:</strong></p>
+                    <p>{selectedJob.Description__c}</p>
+            
+                    <!-- Apply Button -->
+                    <div class="slds-m-top_medium">
+                        <lightning-button label="Apply" variant="brand" onclick={handleApply}></lightning-button>
+                    </div>
+                </template>
+            
+                <template if:false={selectedJob}>
+                    <p>Select a job on the left to see more details.</p>
+                </template>
+            </div>
+        </div>
+
+        <template if:true={error}>
+            <div class="slds-text-color_error slds-p-around_medium">{error}</div>
+        </template>
+
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading..."></lightning-spinner>
+        </template>
+    </lightning-card>
+</template>

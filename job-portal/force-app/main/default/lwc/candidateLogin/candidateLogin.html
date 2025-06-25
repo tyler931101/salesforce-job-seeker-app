@@ -1,0 +1,37 @@
+<template>
+    <lightning-card title="Candidate Login" icon-name="standard:contact">
+        <div class="slds-p-around_medium">
+            <lightning-input
+                name="email"
+                type="email"
+                label="Email"
+                value={email}
+                onchange={handleInputChange}>
+            </lightning-input>
+
+            <lightning-input
+                name="password"
+                type="password"
+                label="Password"
+                value={password}
+                onchange={handleInputChange}>
+            </lightning-input>
+
+            <div class="slds-m-top_medium">
+                <lightning-button
+                    label="Login"
+                    variant="brand"
+                    onclick={handleLogin}>
+                </lightning-button>
+            </div>
+
+            <template if:true={errorMessage}>
+                <div class="slds-text-color_error slds-m-top_medium">{errorMessage}</div>
+            </template>
+
+            <template if:true={successMessage}>
+                <div class="slds-text-color_success slds-m-top_medium">{successMessage}</div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

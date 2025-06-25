@@ -1,0 +1,62 @@
+<template>
+    <div class="container" style="display: flex;">
+        <!-- LEFT: Jobs -->
+        <div class="sidebar" style="width: 30%; padding: 1rem; background-color: #f8f9fa; border-right: 1px solid #dee2e6;">
+            <h2>My Posted Jobs</h2>
+            <template if:true={jobs}>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    <template for:each={jobs} for:item="job">
+                        <li style="padding: 0.75rem, 1rem; border-bottom: 1px solid #e9ecef; cursor: pointer; transition: background-color 0.2s; font-size: 1.25rem;"
+                            key={job.Id}
+                            data-id={job.Id}
+                            onclick={handleJobSelect}
+                        >
+                            {job.Title__c}
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+
+        <!-- RIGHT: Applications -->
+        <div class="main" style="width: 70%; padding: 1.5rem;">
+            <lightning-combobox
+                label="Filter by Status"
+                value={statusFilter}
+                options={statusOptions}
+                onchange={handleStatusFilterChange}>
+            </lightning-combobox>
+
+            <template if:true={applications}>
+                <ul>
+                    <template for:each={applications} for:item="app">
+                        <li style="padding: 0.5rem 0; border-bottom: 1px solid #e9ecef; cursor: pointer; transition: background-color 0.2s;" key={app.applicationId} data-id={app.applicationId} onclick={handleSelectApplication}>
+                            {app.candidateFirstName} {app.candidateLastName} - {app.status} ({app.submissionDate})
+                        </li>
+                    </template>
+                </ul>
+            </template>
+
+            <template if:true={selectedApplication}>
+                <hr/>
+                <h3 style=" margin-top: 1.5rem; color: #343a40;">Candidate Details</h3>
+                <p style="margin: 0.25rem 0;"><strong>Name:</strong> {selectedApplication.candidateFirstName} {selectedApplication.candidateLastName}</p>
+                <p style="margin: 0.25rem 0;"><strong>Email:</strong> {selectedApplication.candidateEmail}</p>
+                <p style="margin: 0.25rem 0;"><strong>Status:</strong> {selectedApplication.status}</p>
+
+                <template if:true={selectedApplication.resumeUrl}>
+                    <p><a href={selectedApplication.resumeUrl} target="_blank" download>Download Resume</a></p>
+                </template>
+
+                <lightning-button style="margin: 0.5rem 0.5rem 0.5rem 0;" label="Interviewing" onclick={handleMarkInterviewing}></lightning-button>
+                <lightning-button style="margin: 0.5rem 0.5rem 0.5rem 0;" label="Hired" onclick={handleMarkHired}></lightning-button>
+                <lightning-button style="margin: 0.5rem 0.5rem 0.5rem 0;" label="Rejected" onclick={handleMarkRejected}></lightning-button>
+
+                <h3 style="margin: 1rem, 0.5rem">Send Email</h3>
+                <lightning-input name="emailSubject" label="Subject" value={emailSubject} onchange={handleEmailInputChange}></lightning-input>
+                <lightning-textarea name="emailBody" label="Body" value={emailBody} onchange={handleEmailInputChange}></lightning-textarea>
+                <lightning-button style="margin: 0.5rem 0.5rem 0.5rem 0;" label="Send Email" onclick={handleSendEmail}></lightning-button>
+            </template>
+        </div>
+    </div>
+</template>
